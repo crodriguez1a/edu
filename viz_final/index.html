@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Project 1 - sample code 2</title>
+	<script src="https://d3js.org/d3.v3.min.js"></script>
+	<style>
+    	text { 
+			font-family: Arial; 
+			font-size: 15px;
+		}
+		.axis path, .axis line {
+			fill: none;
+			stroke: black;
+			shape-rendering: crispEdges;
+		}
+		.tick text {
+			fill: black;
+			font-size: 11px;
+		}
+
+		rect {
+			stroke: white;
+		}
+	</style>
+</head>
+<body>
+
+	<svg id="main" width="600" height="600">
+		<text id='label' x='20' y='20'>Energy prodcution for the US</text>
+		<g transform="translate(30,40)"></g>
+	</svg>
+
+	
+	<script>
+
+		var CHART_WIDTH = 400;
+		var CHART_HEIGHT = 200;
+
+		var MAX_BAR_HEIGHT = 100;
+
+		var energyProduction = [];
+
+		function drawScatterPlot() 
+		{
+			var maxValue = d3.max(energyProduction);
+			var xScale = d3.scale.linear();
+			var yScale = d3.scale.linear();
+
+			xScale.domain([1980, 2012]).range([0, CHART_WIDTH]);
+			yScale.domain([0, 100]).range([CHART_HEIGHT, 0]);
+
+			
+			var g = d3.select('svg').select('g');
+
+
+
+			var xAxis = d3.svg.axis()
+    			.scale(xScale)
+    			.orient('bottom')
+    			.tickFormat(function(d) { return "" + d; })
+
+    		var yAxis = d3.svg.axis()
+    			.scale(yScale)
+    			.orient('left');
+
+
+    		g.append('g')
+    			.attr('class', 'axis')
+    			.attr('transform', 'translate(0,' + CHART_HEIGHT + ')')
+    			.call(xAxis);
+
+    		g.append('g')
+    			.attr('class', 'axis')
+    			.call(yAxis);
+
+    		g.selectAll('circle')
+    			.data(energyProduction)
+    			.enter()
+    			.append('circle')
+    			.style('fill', 'steelblue')
+    			.attr('r', 5)
+    			.attr('cx', function(d) { return d})
+    			.attr('cy', (x) => 'x')
+
+		}
+			
+
+		d3.csv('data/nba_salary_pred_xgb_explainer.csv', function(data) 
+		{
+			if (data) {
+				print(data)
+			}
+			for (var i=0; i<data.length; i++)
+			{
+				var record = data[i];
+				
+				// loop through all years, from 1980 to 2012
+				// for (var y=1980; y<=2012; y++) 
+				// {
+				// 	var value = record[y];
+				// 	var object = {
+				// 		year: y,
+				// 		production: +value
+				// 	};
+
+				// 	energyProduction.push(object);
+				// }
+				console.log(record)
+			}
+			drawScatterPlot();
+
+		});
+		
+	</script>
+</body>
+
+
+</html>
