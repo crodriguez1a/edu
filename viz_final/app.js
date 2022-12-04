@@ -94,7 +94,7 @@ const metricsCard = (errorMetricsAll, metric) => {
         title: {
             text: metric == 'r^2' ? 'R<sup>2</sup>' : `${metric.toUpperCase()}`
         }
-    }]
+    },]
     Plotly.newPlot('metrics', data, layout = {
         title: 'Performance Metrics',
         height: 250
@@ -125,7 +125,7 @@ const r2 = (_data) => 1 - d3.sum(sqErr(_data)) / d3.sum(
 const computeMetrics = (_data) => {
     return {
         'mae': mae(_data),
-        // 'mape': mape(_data),
+        //'mape': mape(_data),
         'rmse': rmse(_data),
         'r^2': r2(_data)
     }
@@ -226,7 +226,8 @@ const YoYError = (_data, metric = 'rmse') => {
     }];
     Plotly.newPlot('yoy-error', data, layout = {
         title: `YoY Error in $`,
-        height: 250
+        height: 250,
+        //width: 400
     });
 
 }
@@ -280,7 +281,7 @@ const playerBreakdown = (_data, pick) => {
             y: [0, 1]
         },
         title: {
-            text: "Predicted Salary"
+            text: `Y&#770; ${name}`
         },
     }];
 
@@ -376,7 +377,8 @@ const dataSummary = (_data) => {
     }]
 
     Plotly.newPlot('data-summary', data, layout = {
-        title: 'Feature Impact Summary'
+        title: 'Feature Impact Summary',
+        height: 'auto'
     });
 
 }
@@ -389,7 +391,7 @@ const assignOptions = (textArray, selector) => {
     }
 }
 
-d3.csv("data/nba_salary_pred_xgb_explainer.csv?1234dfdf", (_data) => {
+d3.csv(`data/nba_salary_pred_xgb_explainer.csv?${Math.random(33)}`, (_data) => {
 
     let selectContainer = document.querySelector('[data-num="0"'),
         featureSelector = selectContainer.querySelector('.feature-filter');
