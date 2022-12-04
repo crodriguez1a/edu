@@ -125,7 +125,7 @@ const r2 = (_data) => 1 - d3.sum(sqErr(_data)) / d3.sum(
 const computeMetrics = (_data) => {
     return {
         'mae': mae(_data),
-        'mape': mape(_data),
+        // 'mape': mape(_data),
         'rmse': rmse(_data),
         'r^2': r2(_data)
     }
@@ -299,13 +299,13 @@ const featureImportance = (_data) => {
 
     let importance = features.map((col) => {
         return {
-            [col]: d3.sum(_data.map((d) => Math.abs(d[col])))
+            [col]: d3.sum(_data.map((d) => d[col]))
         }
     })
-    ranked = _.sortBy(importance, (k) => Object.values(k))
-
+    ranked = _.sortBy(importance, (k) => Math.abs(Object.values(k)[0]))
+    console.log(ranked)
     let data = [{
-        x: ranked.map((r) => Object.values(r)[0]),
+        x: ranked.map((r) => Math.abs(Object.values(r)[0])),
         y: ranked.map((r) => Object.keys(r)[0]),
         type: 'bar',
         orientation: 'h',
@@ -315,7 +315,7 @@ const featureImportance = (_data) => {
     }];
     Plotly.newPlot('importance-rankings', data, layout = {
         title: `Feature Importance Ranking`,
-        height: 400,
+        //height: 400,
         xaxis: {
             title: 'Absolute Impact in $'
         },
@@ -417,9 +417,6 @@ d3.csv("data/nba_salary_pred_xgb_explainer.csv?1234dfdf", (_data) => {
     const updateFeature = () => scatterBubbles(_data, featureSelector.value)
     const updateMetric = () => metricsCard(errorMetricsAll, metricSelector.value)
     const updatePlayerBreakdown = () => playerBreakdown(_data, playerSelector.value)
-
-    segmentSelector.value = 2
-    yearSelector.value = 2014
 
     histPlot(_data)
     segPlot(_data, segmentSelector.value, yearSelector.value)
