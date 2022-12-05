@@ -1,6 +1,12 @@
 const colors = {
     primary: "rgb(48, 188, 237)",
-    secondary: "rgb(100, 58, 113)"
+    primaryLight: "rgba(48, 188, 237, 0.5)",
+    secondary: "rgb(100, 58, 113)",
+    secondaryLight: "rgba(100, 58, 113, 0.5)",
+    primaryOrange: "rgb(252, 122, 30)",
+    secondaryOrange: "rgba(242, 76, 0, 0.3)",
+    primaryGreen: "rgb(77, 170, 87)",
+    secondaryGreen: "rgba(140, 215, 144, 1)"
 }
 
 const exclusions = [
@@ -30,7 +36,8 @@ const scatterBubbles = (_data, feature) => {
         y: _data.map((d) => d[feature]),
         mode: 'markers',
         marker: {
-            size: d3.range(1, 20)
+            size: d3.range(1, 20),
+            color: colors.primaryGreen
         }
     }]
     Plotly.newPlot('scatter-bubbles', trace, layout = {
@@ -94,7 +101,7 @@ const metricsCard = (errorMetricsAll, metric) => {
         title: {
             text: metric == 'r^2' ? 'R<sup>2</sup>' : `${metric.toUpperCase()}`
         }
-    },]
+    }, ]
     Plotly.newPlot('metrics', data, layout = {
         title: 'Performance Metrics',
         height: 250
@@ -115,7 +122,7 @@ const rmse = (_data) => {
 const mae = (_data) => (1 / _data.length) * d3.sum(_data.map((d) => Math.abs(d.TARGET - d.PREDICTION)))
 
 // Mean Absolute Percentage Error = (100/n) ∑(|Actual - Predicted|/Actual)
-const mape = (_data) => (100/_data.length) * d3.sum(_data.map((d) => Math.abs(d.TARGET - d.PREDICTION)/d.TARGET))
+const mape = (_data) => (100 / _data.length) * d3.sum(_data.map((d) => Math.abs(d.TARGET - d.PREDICTION) / d.TARGET))
 
 // R-squared = 1 - (Sum of Squared Errors (SSE) / Total Sum of Squares (TSS))
 const r2 = (_data) => 1 - d3.sum(sqErr(_data)) / d3.sum(
@@ -149,15 +156,14 @@ const boxPlot = (_data) => {
     }]
     Plotly.newPlot('box-target', trace, layout = {
         title: 'Distribution of Salary',
-        height: 300
+        height: 300,
+        yaxis: {title: 'Salary'}
     })
 }
 
-
-
 const segPlot = (_data, xopt = listofQuantiles[0], year = 2014) => {
     year = parseInt(year)
-    filtered = _data.filter((d) => d.YEAR == year && d.quantile_rank == xopt)
+    filtered = _data.filter((d) => d.YEAR == year && d.decile_rank == xopt)
 
     let sorted = filtered.sort(
         (p1, p2) => p1.TARGET - p2.TARGET);
@@ -183,13 +189,14 @@ const segPlot = (_data, xopt = listofQuantiles[0], year = 2014) => {
             color: colors.secondary,
         }
     }];
-    Plotly.newPlot('decile-perf', data, layout = {
+    Plotly.newPlot('quartile-perf', data, layout = {
         barmode: 'group',
         height: 300,
-        title: `Performance by Quartile (${year})`,
+        title: `Annual Performance by Quartile (${year})`,
         xaxis: {
-            tickangle: -38
-        }
+            tickangle: -25,
+        },
+        yaxis: {title: 'Salary'},
     });
 }
 
@@ -213,7 +220,7 @@ const YoYError = (_data, metric = 'rmse') => {
         type: 'bar',
         name: 'RMSE',
         marker: {
-            color: colors.primary,
+            color: colors.secondaryOrange,
         },
     }, {
         x: listofYears(_data),
@@ -221,13 +228,14 @@ const YoYError = (_data, metric = 'rmse') => {
         type: 'bar',
         name: 'MAE',
         marker: {
-            color: colors.secondary,
+            color: colors.primaryOrange,
         }
     }];
     Plotly.newPlot('yoy-error', data, layout = {
         title: `YoY Error in $`,
         height: 250,
-        //width: 400
+        yaxis: {title: 'Salary'},
+        xaxis: {title: 'Year'}
     });
 
 }
@@ -246,7 +254,7 @@ const playerBreakdown = (_data, pick) => {
             x: Object.values(fp),
             orientation: 'h',
             marker: {
-                color: colors.primary,
+                color: colors.primaryGreen,
             }
         }
     });
@@ -304,14 +312,13 @@ const featureImportance = (_data) => {
         }
     })
     ranked = _.sortBy(importance, (k) => Math.abs(Object.values(k)[0]))
-    console.log(ranked)
     let data = [{
         x: ranked.map((r) => Math.abs(Object.values(r)[0])),
         y: ranked.map((r) => Object.keys(r)[0]),
         type: 'bar',
         orientation: 'h',
         marker: {
-            color: colors.secondary,
+            color: colors.secondaryGreen,
         }
     }];
     Plotly.newPlot('importance-rankings', data, layout = {
@@ -319,8 +326,7 @@ const featureImportance = (_data) => {
         //height: 400,
         xaxis: {
             title: 'Absolute Impact in $'
-        },
-
+        }
     });
 }
 
@@ -337,7 +343,7 @@ const dataSummary = (_data) => {
     let values = arr[0].map((_, colIndex) => arr.map(row => row[colIndex]));
     values.splice(0, 0, features.map((f) => `<b>${f}</b>`))
 
-    var data = [{
+    let data = [{
         type: 'table',
         header: {
             values: [
@@ -381,6 +387,34 @@ const dataSummary = (_data) => {
         height: 'auto'
     });
 
+}
+
+const decilePerformance = (_data) => {
+    deciles = groupBy(_data, 'decile_rank')
+    let data = [{
+        type: 'scatter',
+        x: d3.range(1, 11),
+        y: Object.values(deciles).map((d) => d3.mean(d.map((i) => i.PREDICTION))),
+        name: 'Predictions',
+        marker: {
+            color: colors.secondary,
+        }
+
+    }, {
+        type: 'scatter',
+        x: d3.range(1, 11),
+        y: Object.values(deciles).map((d) => d3.mean(d.map((i) => i.TARGET))),
+        name: 'Actuals',
+        marker: {
+            color: colors.primary,
+        }
+    }]
+    Plotly.newPlot('decile-perf', data, layout = {
+        height: 350,
+        title: 'Performance by Decile',
+        yaxis: {title: 'Salary'},
+        xaxis: {title: 'Decile'}
+    })
 }
 
 const assignOptions = (textArray, selector) => {
@@ -429,6 +463,7 @@ d3.csv(`data/nba_salary_pred_xgb_explainer.csv?${Math.random(33)}`, (_data) => {
     playerBreakdown(_data, playerSelector.value)
     dataSummary(_data)
     featureImportance(_data)
+    decilePerformance(_data)
 
     segmentSelector.addEventListener('change', updateSegment, false);
     yearSelector.addEventListener('change', updateSegment, false);
