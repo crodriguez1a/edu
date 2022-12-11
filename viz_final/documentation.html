@@ -13,9 +13,10 @@
                         
                         text-align: justify;
                     }
+                    
                     section {
                         margin: 0 auto;
-                        max-width: 75%;
+                        max-width: 70%;
                     }
                     .figure {
                         text-align: center;
@@ -75,6 +76,22 @@ For general structure, the dashboard is organized in terms of the categories of 
 - Partial dependency
 - Feature importance rankings
 
+### Data Summary
+As discussed, the underlying data is output of the machine learning model. Specifically, the data represents the outcome for predictions made on a test sample of ~600 observations. Each row is comprised as follows:
+
+- The contribution of each feature to the log-odds prediction, such that the sum of contributions (plus the intercept) is the prediction itself
+- The prediction 
+- The actual value (target, dependent or response variable)
+- Error or residuals given by (y_hat - y)
+- Quartile rankings
+- Decile rankings
+
+Additionally, the visualizations rely on runtime calculations to compute aggregate metrics like MAE, RMSE, etc.
+
+```
+const mae = (_data) => (1 / _data.length) * d3.sum(_data.map((d) => Math.abs(d.TARGET - d.PREDICTION)))
+```
+
 ### Color Encodings
 Initially, my strategy was to assign each category of analysis its color palette. For example, distributional visualizations would all share shades of blue and purple. However, adding additional categories introduced confusion for features used across categories (e.g., Actuals). To avoid confusion, I encoded each attribute with the same color consistently. As a result, the final dashboard has three primary color pallets. Color encodings and their corresponding rationales are given in Table 1.
 
@@ -88,28 +105,41 @@ Initially, my strategy was to assign each category of analysis its color palette
 
 ### Avoiding Misleading Information
 It is worth mentioning that the performance visualizations that plot predictions compared to actuals can often be misleading depending on how the data is aggregated. For example, a model may perform better decile simply because most observations produce an accurate prediction. Generally, it is essential to validate performance both at the observation and aggregate levels. As such, the dashboard offers multiple views, including decile, quartile, and individual player outcomes.  
+
+### Layout
+As described, the dashboard is organized by the type of analysis. Additionally, the tiles are ordered such that a visual inspection would gradually tell a story about the model outcome. For example, the distributional analysis is effectively a summary of model residuals. In other words, the user can, at a glance, see the difference between what was predicted and the target without much interpretation needed. Following are the error metrics that provide a more quantitative snapshot of model accuracy. So far, we have introduced only minimal interactions as we are still summarizing the data. 
+
+Next, we provide interactive tools where the analyst can perform further analysis based on individual observations or segments. For example, the user can look at performance for each quartile year-over-year. In this case, we break our categorization rule in that we provide quartile distribution in the same area as the performance by quartile. This exception is made to ensure that the analyst has visual context for each quartile's size as they interactively examine individual quartile outcomes. 
+
+Lastly, we provide the opportunity to examine feature impact at the model level and at the observation level. For example, we can interactively see relationship between feature contributions and the prediction. Alternatively, we can look the impact of each feature on the prediction for a particual player. 
+
 ### Visualization Findings
 At a high level, I would decribe that model performance was moderately good. While the means of the predictions and actuals are quite similar (see boxplot), and the distribution of residuals is mostly normal, the true distribution reflects that our model tends to overpredict for most observations (Figure 2). Additionally, the residual mean is below zero, which may indicate that the model is ultimately too simple to capture the patterns present in the data.
 
 <div class="figure">
-<img src="dist_prediction_actuals.png" />
+<img src="dist_prediction_actuals.png?sd" />
+<p><b>Figure 2 - Distribution of Salary, predicted vs actuals</b></p>
 </div>
 
 We look at mean absolute error(MAE) and root mean squared error (RMSE) as measures of accuracy. Both measures the average magnitude of the errors in a set of predictions, but MAE does not consider direction. In the case of salaries, we want to penalize significant mistakes, so we may focus more on RMSE, which is suitable for cases where significant errors are not acceptable. Our plot of error metrics year-over-year demonstrates higher error rates in more recent years. We can examine this more closely on a quartile basis; we find that the model generally overpredicts. However, as discussed, decile analysis may be misleading as it shows the model underpredicting in later years.
 
-<div class="figure"><img src="error_yoy.png" />
+<div class="figure"><img src="error_yoy.png?sdf" />
+<p><b>Figure 3 - Error year-over-year</b></p>
 </div>
 
 Finally, we examine the features that impact the model outcome most. Looking at the impact of features on individual player salaries, we might conclude, empirically, that TWITTER_FOLLOWERS (which is a proxy for marketability) and EXPERIENCE alter the outcomes the most. However, the overall rankings suggest that marketability serves as the most informative predictor of salary in this model.
    
 <div class="figure">
     <ul>
-        <li><img src="feature-impact.png" /></li>
-        <li><img src="feature_importance_ranking.png" /></li>
+        <li><img src="feature-impact.png?sdf" /></li>
+        <li><img src="feature_importance_ranking.png?sef" /></li>
     </ul>
-
-
+    <p><b>Figure 4 - Feature impact visualizations</b></p>
 </div>
+
+### Limitations
+
+As discussed, the possibilities for a robust outcome analysis can seem endless. One particular visualization that I could not include was the partial dependency plot which is a graphical representation of the average effect of a variable on the response variable, while controlling for the effects of other variables. Partial dependency can be computationally intensive to compute and as such would have to be computed offline and include as separate dataset. As such, we omit PDP plots in this analysis. 
 
 </md-block>
 </section>
