@@ -1,124 +1,148 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Carlos Rodriguez - Final Project</title>
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1"
-    />
-    <script src="d3@4.js"></script>
-    <script src="d3-selection-multi.v1.min.js"></script>
-    <script src="plotly-2.16.1.min.js"></script>
-    <script src="lodash.js?slkfj"></script>
-    <style>
-
-		.control-row {
-			padding: 1em;
-		}
-    </style>
-    <link href="bulma.min.css"
-          rel="stylesheet"
-    />
-  </head>
-  <body>
-    <section class="section">
-      <div class="container">
-        <h1 class="title">Outcome Analysis - NBA Salary Model</h1>
-        <div class="columns">
-          <div class="column is-one-quarter">
-            <div id="box-target"></div>
-          </div>
-          <div class="column">
-            <div id="hist-target"></div>
-          </div>
-          <div class="column">
-            <div>
-              <div id="scatter-bubbles"></div>
-              <div data-num="0">
-                <div class="control-row">
-                  <div class="breadcrumb">
-                    <ul>
-                      <li><span class="tag is-white">Features:</span>
-                        <select class="feature-filter button is-light is-small">
-                        </select></li>
-                    </ul>
-                  </div>
+    <head>
+        <title>Carlos Rodriguez - Final Project</title>
+        <meta name="viewport"
+            content="width=device-width, initial-scale=1"
+            />
+        <script src="d3@4.js"></script>
+        <script src="d3-selection-multi.v1.min.js"></script>
+        <script src="plotly-2.16.1.min.js"></script>
+        <script src="lodash.js?slkfj"></script>
+        <script src="statistics.min.js"></script>
+        <style>
+            .control-row {
+            	padding: 1em;
+            }
+			.cell-rect {
+				height: 2em;
+				text-align: center;
+			}
+        </style>
+        <link href="bulma.min.css"
+            rel="stylesheet"
+            />
+    </head>
+    <body>
+        <section class="section">
+            <div class="container">
+                <h1 class="title">Outcome Analysis - NBA Salary Model</h1>
+				<h1 class="title is-5">Carlos Rodriguez</h1>
+				<h1 class="subtitle is-6">N328 - Visualizing Information</h1>
+				<aside class="buttons">
+					<ul>
+					  <li>
+						<button class="button is-primary is-light">
+							<a href="documentation.html" target="_blank">Documentation</a>
+						</button>
+						<button class="button is-info is-light">Video</button></li>
+					</ul>
+				</aside>
+                <div class="columns">
+                    <div class="column is-one-quarter">
+                        <div id="box-target"></div>
+                    </div>
+                    <div class="column">
+                        <div id="hist-target"></div>
+                    </div>
+                    <div class="column">
+                        <div id="dist-resid"></div>
+                    </div>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="columns">
-          <div class="column is-one-quarter">
-            <div id="metrics"></div>
-            <div data-num="1">
-              <div class="control-row">
-                <div class="breadcrumb">
-                  <ul>
-                    <li><span class="tag is-white">Error Metric:</span>
-                      <select class="metric-filter button is-light is-small">
-                      </select></li>
-                  </ul>
+                <div class="columns">
+                    <div class="column is-two-thirds">
+                        <div id="regression-metrics"></div>
+                        <!-- <div data-num="1">
+                            <div class="control-row">
+                                <div class="breadcrumb">
+                                    <ul>
+                                        <li><span class="tag is-white">Error Metric:</span>
+                                            <select class="metric-filter button is-light is-small">
+                                            </select>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div> -->
+                    </div>
+                    
+                    <div class="column">
+                        <div id="yoy-error"></div>
+                    </div>
                 </div>
-              </div>
-            </div>
-          </div>
-		  <div class="column is-one-half">
-			<div id="decile-perf"></div>
-		  </div>
-          <div class="column">
-            <div id="yoy-error"></div>
-          </div>
-		</div>
-		<div class="columns">
-          <div class="column">
-            <div>
-              <div id="quartile-perf"></div>
-              <div data-num="2">
-                <div class="control-row">
-                  <div class="breadcrumb">
-                    <ul>
-                      <li><span class="tag is-white">Quartile:</span>
-                        <select class="seg-filter button is-light is-small">
-                        </select></li>
-                      <li><span class="tag is-white">Year:</span>
-                        <select class="year-filter button is-light is-small">
-                        </select></li>
-                    </ul>
-                  </div>
+                <div class="columns">
+					<div class="column">
+                        <div id="decile-perf"></div>
+                    </div>
+                    <div class="column is-two-thirds">
+                        <div>
+                            <div id="quartile-perf"></div>
+                            <div data-num="2">
+                                <div class="control-row">
+                                    <div class="breadcrumb">
+                                        <ul>
+                                            <li><span class="tag is-white">Quartile:</span>
+                                                <select class="seg-filter button is-light is-small">
+                                                </select>
+                                            </li>
+                                            <li><span class="tag is-white">Year:</span>
+                                                <select class="year-filter button is-light is-small">
+                                                </select>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="columns">
-          <div class="column">
-            <div id="player-breakdown"></div>
-            <div data-num="3">
-              <div class="control-row">
-                <div class="breadcrumb">
-                  <ul>
-                    <li><span class="tag is-white">Player:</span>
-                      <select class="player-filter button is-light is-small">
-                      </select></li>
-                  </ul>
+                <div class="columns">
+					<div class="column">
+                        <div>
+                            <div id="scatter-bubbles"></div>
+                            <div data-num="0">
+                                <div class="control-row">
+                                    <div class="breadcrumb">
+                                        <ul>
+                                            <li><span class="tag is-white">Features:</span>
+                                                <select class="feature-filter button is-light is-small">
+                                                </select>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div id="player-breakdown"></div>
+                        <div data-num="3">
+                            <div class="control-row">
+                                <div class="breadcrumb">
+                                    <ul>
+                                        <li><span class="tag is-white">Player:</span>
+                                            <select class="player-filter button is-light is-small">
+                                            </select>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column is-one-quarter">
+                        <div id="player-salary"></div>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
-          <div class="column is-one-quarter">
-            <div id="player-salary"></div>
-          </div>
-        </div>
-      </div>
-      <div class="columns">
-        <div class="column">
-          <div id="data-summary"></div>
-        </div>
-        <div class="column is-one-third">
-          <div id="importance-rankings"></div>
-        </div>
-      </div>
-    </section>
-    <script src="app.js?2dffs"></script>
-  </body>
+            <div class="columns">
+                <div class="column">
+                    <div id="data-summary"></div>
+                </div>
+                <div class="column is-one-third">
+                    <div id="importance-rankings"></div>
+                </div>
+            </div>
+        </section>
+        <script src="app.js?2df34234fffs"></script>
+    </body>
 </html>

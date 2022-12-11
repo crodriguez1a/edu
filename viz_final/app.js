@@ -6,7 +6,8 @@ const colors = {
     primaryOrange: "rgb(252, 122, 30)",
     secondaryOrange: "rgba(242, 76, 0, 0.3)",
     primaryGreen: "rgb(77, 170, 87)",
-    secondaryGreen: "rgba(140, 215, 144, 1)"
+    secondaryGreen: "rgba(140, 215, 144, 1)",
+    primaryRed: "rgb(254, 95, 85)"
 }
 
 const exclusions = [
@@ -41,7 +42,7 @@ const scatterBubbles = (_data, feature) => {
         }
     }]
     Plotly.newPlot('scatter-bubbles', trace, layout = {
-        title: `Feature Impact (${feature.toLocaleLowerCase()})`,
+        title: `Impact by Feature (${feature.toLocaleLowerCase()})`,
         height: 300,
         xaxis: {
             title: "Salary"
@@ -50,6 +51,28 @@ const scatterBubbles = (_data, feature) => {
             title: `${feature.toLocaleLowerCase()}`
         }
     })
+}
+
+const distResid = (_data) => {
+  trace = [{
+    histfunc: "count",
+    x: _data.map((d) => d.E),
+    type: 'histogram',
+    marker: {
+      color: colors.primaryRed
+    }
+  }]
+  Plotly.newPlot('dist-resid', trace, layout = {
+    height: 300,
+    barmode: 'stack',
+    title: `Distribution of Residuals`,
+    xaxis: {
+        title: "Residuals"
+    },
+    yaxis: {
+        title: "Count"
+    }
+});
 }
 
 const histPlot = (_data) => {
@@ -103,7 +126,7 @@ const metricsCard = (errorMetricsAll, metric) => {
         }
     }, ]
     Plotly.newPlot('metrics', data, layout = {
-        title: 'Performance Metrics',
+        title: 'Regression Metrics',
         height: 250
     });
 }
@@ -217,7 +240,7 @@ const YoYError = (_data, metric = 'rmse') => {
     let data = [{
         x: listofYears(_data),
         y: Object.values(years).map((y) => rmse(y)),
-        type: 'bar',
+        type: 'scatter',
         name: 'RMSE',
         marker: {
             color: colors.secondaryOrange,
@@ -225,14 +248,14 @@ const YoYError = (_data, metric = 'rmse') => {
     }, {
         x: listofYears(_data),
         y: Object.values(years).map((y) => mae(y)),
-        type: 'bar',
+        type: 'scatter',
         name: 'MAE',
         marker: {
             color: colors.primaryOrange,
         }
     }];
     Plotly.newPlot('yoy-error', data, layout = {
-        title: `YoY Error in $`,
+        title: `Error Metrics Year-over-Year in $`,
         height: 250,
         yaxis: {title: 'Salary'},
         xaxis: {title: 'Year'}
@@ -260,8 +283,8 @@ const playerBreakdown = (_data, pick) => {
     });
     Plotly.newPlot('player-breakdown', data, layout = {
         barmode: 'group',
-        title: `Feature Impact by Player - ${name}, ${year}`,
-        height: 380,
+        title: `Feature Impact per Player - ${name}, ${year}`,
+        //height: 380,
         yaxis: {
             tickangle: -38
         },
@@ -289,7 +312,7 @@ const playerBreakdown = (_data, pick) => {
             y: [0, 1]
         },
         title: {
-            text: `Y&#770; ${name}`
+            text: `Y&#770; for ${name}`
         },
     }];
 
@@ -383,10 +406,72 @@ const dataSummary = (_data) => {
     }]
 
     Plotly.newPlot('data-summary', data, layout = {
-        title: 'Feature Impact Summary',
+        title: 'Feature Impact Summary - Log-odds Impact',
         height: 'auto'
     });
 
+}
+
+const regressionMetrics = (_data) => {
+  let vars = {
+    y_true: 'interval',
+    y_pred: 'interval'
+  }
+  let stats = new Statistics(_data.map((d) => {return {
+    y_true: parseFloat(d.TARGET), 
+    y_pred: parseFloat(d.PREDICTION)
+  }}), 
+    vars);
+  let pearson = stats.correlationCoefficient('y_true', 'y_pred').correlationCoefficient;
+  console.log(stats)
+  let resid_mean = d3.mean(_data.map((d) => d.E))
+  values = [
+    mae(_data), rmse(_data), r2(_data), pearson, resid_mean
+  ].map((m) => m>1 ? m.toLocaleString('en-US', { style: 'currency', currency: 'USD' }) : m.toFixed(3))
+  
+  let data = [{
+    type: 'table',
+    header: {
+        values: [
+            ["<b>MAE</b>"],
+            ["<b>RMSE</b>"],
+            ["<b>R^2</b>"],
+            ["<b>Pearson</b>"],
+            ["<b>Residual Mean</b>"]
+        ],
+        align: "center",
+        line: {
+            width: 1,
+            color: 'black'
+        },
+        fill: {
+            color: "grey"
+        },
+        font: {
+            family: "Arial",
+            size: 12,
+            color: "white"
+        }
+    },
+    cells: {
+        values: values,
+        align: "center",
+        line: {
+            color: "black",
+            width: 1
+        },
+        font: {
+            family: "Arial",
+            size: 16,
+            color: ["black"]
+        }
+    }
+}]
+
+Plotly.newPlot('regression-metrics', data, layout = {
+    title: 'Regression Metrics Summary',
+    height: 260
+});
 }
 
 const decilePerformance = (_data) => {
@@ -430,8 +515,8 @@ d3.csv(`data/nba_salary_pred_xgb_explainer.csv?${Math.random(33)}`, (_data) => {
     let selectContainer = document.querySelector('[data-num="0"'),
         featureSelector = selectContainer.querySelector('.feature-filter');
 
-    let selectContainer2 = document.querySelector('[data-num="1"'),
-        metricSelector = selectContainer2.querySelector('.metric-filter');
+    // let selectContainer2 = document.querySelector('[data-num="1"'),
+    //     metricSelector = selectContainer2.querySelector('.metric-filter');
 
     let selectContainer3 = document.querySelector('[data-num="2"'),
         segmentSelector = selectContainer3.querySelector('.seg-filter'),
@@ -445,30 +530,32 @@ d3.csv(`data/nba_salary_pred_xgb_explainer.csv?${Math.random(33)}`, (_data) => {
     assignOptions(listofFeatures(_data), featureSelector)
 
     errorMetricsAll = computeMetrics(_data)
-    assignOptions(Object.keys(errorMetricsAll), metricSelector)
+    // assignOptions(Object.keys(errorMetricsAll), metricSelector)
     assignOptions(listofPlayers(_data), playerSelector)
 
     const updateSegment = () => segPlot(_data, segmentSelector.value, yearSelector.value)
     const updateHist = () => histPlot(_data, yearSelector.value)
     const updateFeature = () => scatterBubbles(_data, featureSelector.value)
-    const updateMetric = () => metricsCard(errorMetricsAll, metricSelector.value)
+    // const updateMetric = () => metricsCard(errorMetricsAll, metricSelector.value)
     const updatePlayerBreakdown = () => playerBreakdown(_data, playerSelector.value)
 
     histPlot(_data)
+    distResid(_data)
     segPlot(_data, segmentSelector.value, yearSelector.value)
     scatterBubbles(_data, featureSelector.value)
     boxPlot(_data)
-    metricsCard(errorMetricsAll, metricSelector.value)
+    // metricsCard(errorMetricsAll, metricSelector.value)
     YoYError(_data)
     playerBreakdown(_data, playerSelector.value)
     dataSummary(_data)
     featureImportance(_data)
     decilePerformance(_data)
+    regressionMetrics(_data)
 
     segmentSelector.addEventListener('change', updateSegment, false);
     yearSelector.addEventListener('change', updateSegment, false);
     yearSelector.addEventListener('change', updateHist, false);
     featureSelector.addEventListener('change', updateFeature, false);
-    metricSelector.addEventListener('change', updateMetric, false);
+    // metricSelector.addEventListener('change', updateMetric, false);
     playerSelector.addEventListener('change', updatePlayerBreakdown, false);
 })
