@@ -32,7 +32,7 @@ let listofFeatures = (_data) => _data.columns.filter((f) => f != '')
 let listofPlayers = (_data) => _.uniq(_data.map((d) => [d.PLAYER, d.YEAR]))
 
 const scatterFeatureImpact = (_data, feature) => {
-    trace = [{
+    let trace = [{
         x: _data.map((d) => d.PREDICTION),
         y: _data.map((d) => d[feature]),
         mode: 'markers',
@@ -54,7 +54,7 @@ const scatterFeatureImpact = (_data, feature) => {
 }
 
 const distResid = (_data) => {
-    trace = [{
+    let trace = [{
         histfunc: "count",
         x: _data.map((d) => d.E),
         type: 'histogram',
@@ -76,7 +76,7 @@ const distResid = (_data) => {
 }
 
 const histPlot = (_data) => {
-    trace = [{
+    let trace = [{
         histfunc: "count",
         x: _data.map((d) => d.TARGET),
         type: 'histogram',
@@ -153,7 +153,7 @@ const r2 = (_data) => 1 - d3.sum(sqErr(_data)) / d3.sum(
 )
 
 const boxPlot = (_data) => {
-    trace = [{
+    let trace = [{
         y: _data.map((d) => d.TARGET),
         type: 'box',
         name: 'Actual',
@@ -184,9 +184,9 @@ const segPlot = (_data, xopt = listofQuantiles[0], year = 2014) => {
     let sorted = filtered.sort(
         (p1, p2) => p1.TARGET - p2.TARGET);
 
-    x = filtered.map((d) => d.PLAYER)
-    y = filtered.map((d) => d.TARGET)
-    y2 = filtered.map((d) => d.PREDICTION)
+    let x = filtered.map((d) => d.PLAYER)
+    let y = filtered.map((d) => d.TARGET)
+    let y2 = filtered.map((d) => d.PREDICTION)
 
     let data = [{
         x: x,
@@ -258,7 +258,7 @@ const YoYError = (_data, metric = 'rmse') => {
 }
 
 const quartileHistogram = (_data) => {
-    data = [{
+    let data = [{
         x: _data.map((d) => d.TARGET),
         type: 'histogram',
         name: 'Actuals',
@@ -352,7 +352,7 @@ const featureImportance = (_data) => {
             [col]: d3.sum(_data.map((d) => d[col]))
         }
     })
-    ranked = _.sortBy(importance, (k) => Math.abs(Object.values(k)[0]))
+    let ranked = _.sortBy(importance, (k) => Math.abs(Object.values(k)[0]))
     let data = [{
         x: ranked.map((r) => Math.abs(Object.values(r)[0])),
         y: ranked.map((r) => Object.keys(r)[0]),
@@ -372,7 +372,7 @@ const featureImportance = (_data) => {
 }
 
 const dataSummary = (_data) => {
-    features = listofFeatures(_data)
+    let features = listofFeatures(_data)
     let arr = features.map((col) => {
         return [
             d3.mean(_data.map((d) => parseFloat(d[col]))).toFixed(2),
