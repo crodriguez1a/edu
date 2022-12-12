@@ -179,8 +179,8 @@ const boxPlot = (_data) => {
 
 const segPlot = (_data, xopt = listofQuantiles[0], year = 2014) => {
     year = parseInt(year)
-    filtered = _data.filter((d) => d.YEAR == year && d.decile_rank == xopt)
 
+    let filtered = _data.filter((d) => d.YEAR == year && d.decile_rank == xopt)
     let sorted = filtered.sort(
         (p1, p2) => p1.TARGET - p2.TARGET);
 
@@ -227,11 +227,7 @@ const groupBy = function(xs, key) {
 };
 
 const YoYError = (_data, metric = 'rmse') => {
-    years = groupBy(_data, 'YEAR')
-    mm = {
-        'mae': mae,
-        'rmse': rmse,
-    }
+    let years = groupBy(_data, 'YEAR')
     let data = [{
         x: listofYears(_data),
         y: Object.values(years).map((y) => rmse(y)),
@@ -259,7 +255,6 @@ const YoYError = (_data, metric = 'rmse') => {
             title: 'Year'
         }
     });
-
 }
 
 const quartileHistogram = (_data) => {
@@ -288,10 +283,10 @@ const quartileHistogram = (_data) => {
 }
 
 const playerBreakdown = (_data, pick) => {
-    _player = pick.split(',')
+    let _player = pick.split(',')
     let name = _player[0]
     let year = _player[1]
-    player = _data.filter((d) => d.PLAYER == name && d.YEAR == year)
+    let player = _data.filter((d) => d.PLAYER == name && d.YEAR == year)
 
     let data = player.map((p) => {
         fp = _.pickBy(p, (v, k) => exclusions.indexOf(k) == -1)
@@ -352,7 +347,6 @@ const pdpPlot = (_data) => {
 
 const featureImportance = (_data) => {
     let features = listofFeatures(_data)
-
     let importance = features.map((col) => {
         return {
             [col]: d3.sum(_data.map((d) => d[col]))
@@ -456,11 +450,10 @@ const pearson = (_data) => stats_js(_data).correlationCoefficient('y_true', 'y_p
 const resid_mean = (_data) => d3.mean(_data.map((d) => d.E))
 
 const regressionMetrics = (_data) => {
-
     let prsn = pearson(_data)
     let res_mu = resid_mean(_data)
 
-    values = [
+    let values = [
         mae(_data), rmse(_data), r2(_data), prsn, res_mu
     ].map((m) => m > 1 ? m.toLocaleString('en-US', {
         style: 'currency',
@@ -505,7 +498,6 @@ const regressionMetrics = (_data) => {
             }
         }
     }]
-
     Plotly.newPlot('regression-metrics', data, layout = {
         title: 'Regression Metrics Summary',
         height: 260
@@ -522,7 +514,6 @@ const decilePerformance = (_data) => {
         marker: {
             color: colors.secondary,
         }
-
     }, {
         type: 'scatter',
         x: d3.range(1, 11),
