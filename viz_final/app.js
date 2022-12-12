@@ -543,7 +543,7 @@ const assignOptions = (textArray, selector) => {
     }
 }
 
-d3.csv(`data/nba_salary_pred_xgb_explainer.csv?${Math.random(33)}`, (_data) => {
+d3.csv(`data/nba_salary_pred_xgb_explainer.csv`, (_data) => {
 
     let selectContainer = document.querySelector('[data-num="0"'),
         featureSelector = selectContainer.querySelector('.feature-filter');
