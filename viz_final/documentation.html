@@ -4,8 +4,8 @@
         <title>Carlos Rodriguez - Final Project</title>
         <meta name="viewport"
             content="width=device-width, initial-scale=1"
-            /><head><script type="module" src="https://md-block.verou.me/md-block.js"></script>
-                <link href="pico.min.css"
+            /><head><script type="module" src="lib/md-block.js"></script>
+                <link href="css/pico.min.css"
                 rel="stylesheet"
                 />
                 <style>
@@ -66,7 +66,7 @@ The dashboard intends to facilitate this level of exploration. As such, I design
 Figure 1 gives an early outline of the dashboard layout.
 
 <div class="figure">
-    <img src="dash-sketch.jpg?sdf" />
+    <img src="img/dash-sketch.jpg?sdf" />
 </div>
 
 
@@ -120,13 +120,13 @@ Lastly, we provide the opportunity to examine feature impact at the model level 
 At a high level, I would decribe that model performance was moderately good. While the means of the predictions and actuals are quite similar (see boxplot), and the distribution of residuals is mostly normal, the true distribution reflects that our model tends to overpredict for most observations (Figure 2). Additionally, the residual mean is below zero, which may indicate that the model is ultimately too simple to capture the patterns present in the data.
 
 <div class="figure">
-<img src="dist_prediction_actuals.png?sd" />
+<img src="img/dist_prediction_actuals.png?sd" />
 <p><b>Figure 2 - Distribution of Salary, predicted vs actuals</b></p>
 </div>
 
 We look at mean absolute error(MAE) and root mean squared error (RMSE) as measures of accuracy. Both measures the average magnitude of the errors in a set of predictions, but MAE does not consider direction. In the case of salaries, we want to penalize significant mistakes, so we may focus more on RMSE, which is suitable for cases where significant errors are not acceptable. Our plot of error metrics year-over-year demonstrates higher error rates in more recent years. We can examine this more closely on a quartile basis; we find that the model generally overpredicts. However, as discussed, decile analysis may be misleading as it shows the model underpredicting in later years.
 
-<div class="figure"><img src="error_yoy.png?sdf" />
+<div class="figure"><img src="img/error_yoy.png?sdf" />
 <p><b>Figure 3 - Error year-over-year</b></p>
 </div>
 
@@ -134,8 +134,8 @@ Finally, we examine the features that impact the model outcome most. Looking at 
    
 <div class="figure">
     <ul>
-        <li><img src="feature-impact.png?sdf" /></li>
-        <li><img src="feature_importance_ranking.png?sef" /></li>
+        <li><img src="img/feature-impact.png?sdf" /></li>
+        <li><img src="img/feature_importance_ranking.png?sef" /></li>
     </ul>
     <p><b>Figure 4 - Feature impact visualizations</b></p>
 </div>
