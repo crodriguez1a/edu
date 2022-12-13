@@ -82,7 +82,7 @@ For general structure, the dashboard is organized in terms of the categories of 
 ### Data Summary
 As discussed, the underlying data is output of the machine learning model. Specifically, the data represents the outcome for predictions made on a test sample of ~600 observations. Each row is comprised as follows:
 
-- The contribution of each feature to the log-odds prediction, such that the sum of contributions (plus the intercept) is the prediction itself
+- The contribution of each feature to the prediction, such that the sum of contributions (plus the intercept) is the prediction itself
 - The prediction 
 - The actual value (target, dependent or response variable)
 - Error or residuals given by (y_hat - y)
@@ -104,7 +104,7 @@ Initially, my strategy was to assign each category of analysis its color palette
 | ----------- | ----------- |----------- |
 | Distribution      | Purples, Blues, Reds       |Distribution primarily consists of two attributes, Actuals and Predictions. These two attributes are encoded consistently throughout in blue or purple. We use two similar colors to denote that attributes will always show some relationship (e.g., monotonicity). Alternatively, reds and oranges are used to display error or residuals throughout. All three attributes are cross-cutting and kept consistent through the categories.       |
 | Metrics   | Oranges, Reds        |It is commonly accepted that reds indicate some level or warning or caution. In statistics, we find that error is often encoded with shades of red. As such, we use reds in the same way to create familiarity.        |
-| Feature Attribution   | Greens        |We visualize multiple feature attribution on multiple levels using a single attribute. The contribution of each feature to the log-odds output of the model. For consistency, all visualizations using this attribute use green.        |
+| Feature Attribution   | Greens        |We visualize multiple feature attribution on multiple levels using a single attribute. The contribution of each feature to the output of the model. For consistency, all visualizations using this attribute use green.        |
 
 ### Avoiding Misleading Information
 It is worth mentioning that the performance visualizations that plot predictions compared to actuals can often be misleading depending on how the data is aggregated. For example, a model may perform better decile simply because most observations produce an accurate prediction. Generally, it is essential to validate performance both at the observation and aggregate levels. As such, the dashboard offers multiple views, including decile, quartile, and individual player outcomes.  
