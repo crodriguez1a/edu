@@ -1,3 +1,4 @@
 # edu
 
-- [Visualizing Information](https://crodriguez1a.github.io/edu/viz_final/)
+- [Visualizing Information](viz_final/)
+- [Statistical Learning](ISL/)
