@@ -424,7 +424,7 @@ const dataSummary = (_data) => {
     }]
 
     Plotly.newPlot('data-summary', data, layout = {
-        title: 'Feature Impact Summary - Log-odds Impact',
+        title: 'Feature Impact Summary',
         height: 'auto'
     });
 
